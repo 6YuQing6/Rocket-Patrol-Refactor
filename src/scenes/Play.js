@@ -10,9 +10,13 @@ preload() {
   this.load.image('starfield', './assets/starfield.png');
   // load spritesheet
   this.load.spritesheet('explosion', './assets/explosion.png', {frameWidth: 64, frameHeight: 32, startFrame: 0, endFrame: 9});
+  //this.load.audio('bg-music', './assets/Space-Jazz.wav');
 }
 
 create() {
+    //background music
+    //bg_music = this.sound.add('bg-music', {loop: true});
+
     // place tile sprite
     this.starfield = this.add.tileSprite(0, 0, 640, 480, 'starfield').setOrigin(0, 0);
     // green UI background
@@ -45,20 +49,40 @@ create() {
     // initialize score
     this.p1Score = 0;
 
-      // display score
-    let scoreConfig = {
-        fontFamily: 'Courier',
-        fontSize: '28px',
-        backgroundColor: '#F3B141',
-        color: '#843605',
-        align: 'right',
-        padding: {
+  // display score
+  let scoreConfig = {
+    fontFamily: 'Courier',
+    fontSize: '28px',
+    backgroundColor: '#F3B141',
+    color: '#843605',
+    align: 'right',
+    padding: {
+    top: 5,
+    bottom: 5,
+    },
+    fixedWidth: 100
+  }
+  this.scoreLeft = this.add.text(borderUISize + borderPadding, borderUISize + borderPadding*2, this.p1Score, scoreConfig);
+
+    
+    
+    //display time
+    let timeConfig = {
+      fontFamily: 'Courier',
+      fontSize: '28px',
+      backgroundColor: '#F3B141',
+      color: '#843605',
+      align: 'right',
+      padding: {
         top: 5,
         bottom: 5,
-        },
-        fixedWidth: 100
+      },
+      fixedWidth: 100
     }
-    this.scoreLeft = this.add.text(borderUISize + borderPadding, borderUISize + borderPadding*2, this.p1Score, scoreConfig);
+    
+    this.timeLeft = this.add.text(game.config.width - borderUISize - borderPadding - timeConfig.fixedWidth, borderUISize + borderPadding*2, this.timeremain, timeConfig);
+    //timer code from: https://labs.phaser.io/edit.html?src=src/time\timer%20event.js
+    this.timedEvent = this.time.delayedCall(game.settings.gameTimer, this.onEvent, [], this);
 
     // GAME OVER flag
     this.gameOver = false;
@@ -87,6 +111,8 @@ create() {
         this.ship01.update();               // update spaceships (x3)
         this.ship02.update();
         this.ship03.update();
+        let seconds = Math.floor(this.timedEvent.getRemainingSeconds());
+        this.timeLeft.setText(seconds.toString());
     }
 // check collisions
     if(this.checkCollision(this.p1Rocket, this.ship03)) {
@@ -129,6 +155,9 @@ create() {
     // score add and repaint
     this.p1Score += ship.points;
     this.scoreLeft.text = this.p1Score;  
-    this.sound.play('sfx_explosion');    
+    console.log(this.p1Score);
+    let sound = Math.floor(Math.random() * 4);
+    const sounds = ['explosion0','explosion1','explosion2','explosion3'];
+    this.sound.play(sounds[sound]);    
   }
 }
